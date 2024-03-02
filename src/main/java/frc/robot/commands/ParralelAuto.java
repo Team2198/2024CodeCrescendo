@@ -14,6 +14,6 @@ public class ParralelAuto {
     }
 
     public Command intakeAndDrive(double distance, double angle) {
-        return Commands.parallel(new AutoDrive(drive, distance, angle), new shooterCommand(shoot).withTimeout(2));
+        return Commands.parallel(new AutoDrive(drive, distance, angle), new ShooterCommand(shoot).withTimeout(2));
     }
 }

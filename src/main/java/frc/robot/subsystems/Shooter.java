@@ -4,24 +4,26 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import com.revrobotics.CANSparkLowLevel.MotorType;
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
-  CANSparkMax shooterMotor = new CANSparkMax(12, MotorType.kBrushless);
-  public Shooter() {}
+  CANSparkMax shooterMotorOne = new CANSparkMax(12, MotorType.kBrushless);
+  CANSparkMax shooterMotorTwo = new CANSparkMax(13, MotorType.kBrushless);
+  public Shooter() {
+    //shooterMotorOne.setInverted(true);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
+  
 
-  public void shoot(double speed){
-    SmartDashboard.putString("inside shooter", "yes");
-    shooterMotor.set(speed);
+  public void shootMotor(double speed){
+    shooterMotorOne.set(-speed);
+    shooterMotorTwo.set(speed);
+    
   }
 }

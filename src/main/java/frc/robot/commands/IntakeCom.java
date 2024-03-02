@@ -5,14 +5,26 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Shooter;
-public class ShooterCommand extends Command {
-  /** Creates a new ShooterCommand. */
-  Shooter shooter;
-  public ShooterCommand(Shooter shoot) {
-    this.shooter = shoot;
-    addRequirements(shooter);
+import frc.robot.subsystems.IntakeSub;
+
+public class IntakeCom extends Command {
+
+  IntakeSub intakee;
+  boolean lower;
+  boolean raise;
+  boolean takeIn;
+  boolean all;
+
+  /** Creates a new sensorCom. */
+  public IntakeCom(IntakeSub intakey, boolean down, boolean up, boolean take, boolean allOf) {
     // Use addRequirements() here to declare subsystem dependencies.
+    intakee = intakey;
+    lower = down;
+    raise = up;
+    take = takeIn;
+    all = allOf;
+
+    addRequirements(intakee);
   }
 
   // Called when the command is initially scheduled.
@@ -22,14 +34,25 @@ public class ShooterCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.shootMotor(0.4);
+    if(lower){
+      intakee.extendIntake();
+    }
+    if(takeIn){
+      intakee.takeNode();
+    }
+    if(raise){
+      intakee.retractIntake();
+    }
+    if(all){
+      intakee.extendIntake();
+      intakee.takeNode();
+      intakee.retractIntake();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    shooter.shootMotor(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

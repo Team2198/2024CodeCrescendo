@@ -10,11 +10,12 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.ParralelAuto;
-import frc.robot.commands.shooterCommand;
+import frc.robot.commands.intakeOverride;
+import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.turningCommand;
 import frc.robot.subsystems.DriveSub;
 import frc.robot.subsystems.ExampleSubsystem;
-
+import frc.robot.subsystems.IntakeSub;
 import frc.robot.subsystems.Shooter;
 
 //import com.pathplanner.lib.auto.NamedCommands;
@@ -25,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+import frc.robot.commands.intakeOverride;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -46,8 +47,10 @@ public class RobotContainer {
 
   ParralelAuto autoSegment;
   Command auto;
+  IntakeSub intake = new IntakeSub();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    
     //NamedCommands.registerCommand("shooter", new shooterCommand(shoot));
     // Configure the trigger bindings
     drive = new DriveSub();
@@ -71,15 +74,19 @@ public class RobotContainer {
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
     
-        drive.setDefaultCommand(new DriveCommand(drive,()->m_driverController.getLeftY(), ()->m_driverController.getLeftX(), ()->m_driverController.getRightX(), ()->m_driverController.x().getAsBoolean()));
+    //drive.setDefaultCommand(new DriveCommand(drive,()->m_driverController.getLeftY(), ()->m_driverController.getLeftX(), ()->m_driverController.getRightX(), ()->m_driverController.x().getAsBoolean()));
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().onTrue(auto);
+    intake.setDefaultCommand(new intakeOverride(intake, ()->m_driverController.getRightY(), ()->m_driverController.getLeftY()));
+    m_driverController.b().whileTrue(new ShooterCommand(shoot));
+
      //m_driverController.a().whileTrue(new IntakeCom(intakee, true, false, false, false));
     
   }
 
   /**
+   * .
+   * 
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous

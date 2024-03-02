@@ -186,8 +186,8 @@ public class DriveSub extends SubsystemBase {
     return frontLeft.atSetpoint();
   } 
 
-  //
-  public void turnToAngle(double goal){
+  //pass the angle that you want the robot to turn to
+  public boolean turnToAngle(double goal){
     
     if (goal>180){
       goal = goal-360;
@@ -198,7 +198,8 @@ public class DriveSub extends SubsystemBase {
 
     
     robotRelative(0, 0, turnSpeed);
-    
+    //returns true if auto aligned
+    return pidController.atSetpoint();
     
     
   }

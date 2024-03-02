@@ -31,7 +31,7 @@ public class turningCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.turnToAngle(goal);
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -39,6 +39,11 @@ public class turningCommand extends Command {
   public void end(boolean interrupted) {
     drive.robotRelative(0, 0, 0);
     
+  }
+
+  @Override
+  public boolean isFinished(){
+    return drive.turnToAngle(goal);
   }
 
   // Returns true when the command should end.
