@@ -18,6 +18,7 @@ import frc.robot.subsystems.DriveSub;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.IntakeSub;
 import frc.robot.subsystems.Shooter;
+import frc.robot.commands.AutoAlign;
 
 //import com.pathplanner.lib.auto.NamedCommands;
 //import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -83,7 +84,7 @@ public class RobotContainer {
     m_driverController.y().whileTrue(new IntakeCom(intake, true, false));
     m_driverController.x().whileTrue(new IntakeCom(intake, false, false));
     m_driverController.a().whileTrue(new IntakeCom(intake, false, true));
-
+    m_driverController.rightTrigger().whileTrue(new AutoAlign(drive));
 
      //m_driverController.a().whileTrue(new IntakeCom(intakee, true, false, false, false));
     

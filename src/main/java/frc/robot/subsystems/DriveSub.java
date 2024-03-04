@@ -34,6 +34,8 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Meters;
@@ -218,9 +220,16 @@ public class DriveSub extends SubsystemBase {
       
     } 
     return reachedDest;
-    
 
+  }
 
+  public double getLimelight(){
 
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+
+    double x = tx.getDouble(0.0) * -1;
+
+    return x;
   }
 }
