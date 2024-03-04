@@ -5,9 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSub;
 
@@ -50,7 +47,7 @@ public class AutoAlign extends CommandBase {
     
     boolean turnState = drive.turnToAngle(robotTurnGoal);
     SmartDashboard.putBoolean("Robot turned goal yet", turnState);
-    
+
     return turnState;
   }
 }
