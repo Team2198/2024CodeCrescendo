@@ -10,19 +10,16 @@ import frc.robot.subsystems.IntakeSub;
 public class IntakeCom extends Command {
 
   IntakeSub intakee;
-  boolean lower;
-  boolean raise;
+  boolean extend;
   boolean takeIn;
   boolean all;
 
   /** Creates a new sensorCom. */
-  public IntakeCom(IntakeSub intakey, boolean down, boolean up, boolean take, boolean allOf) {
+  public IntakeCom(IntakeSub intakey, boolean extender, boolean take) {
     // Use addRequirements() here to declare subsystem dependencies.
     intakee = intakey;
-    lower = down;
-    raise = up;
+    extend = extender;
     take = takeIn;
-    all = allOf;
 
     addRequirements(intakee);
   }
@@ -34,20 +31,16 @@ public class IntakeCom extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(lower){
+    if(extend){
       intakee.extendIntake();
+    }
+    if(!extend && !takeIn){
+      intakee.retractIntake();
     }
     if(takeIn){
       intakee.takeNode();
     }
-    if(raise){
-      intakee.retractIntake();
-    }
-    if(all){
-      intakee.extendIntake();
-      intakee.takeNode();
-      intakee.retractIntake();
-    }
+    
   }
 
   // Called once the command ends or is interrupted.

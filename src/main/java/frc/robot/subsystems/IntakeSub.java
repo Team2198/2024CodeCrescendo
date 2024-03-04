@@ -28,9 +28,9 @@ public class IntakeSub extends SubsystemBase {
   Color detectedColor;
   double distance;
 
-  //PWMSparkMax blinkinPWM = new PWMSparkMax(9);
+  PWMSparkMax blinkinPWM = new PWMSparkMax(9);
 
-  CANSparkMax m_arm = new CANSparkMax(9, MotorType.kBrushless);
+  CANSparkMax m_arm;
   CANSparkMax m_intake;
   RelativeEncoder myEncoder = m_arm.getEncoder();
   double myAngle;
@@ -38,33 +38,30 @@ public class IntakeSub extends SubsystemBase {
   /** Creates a new colorSensor. */
   public IntakeSub() {
     colorMatcher.addColorMatch(NodeColor);
-    
-    
-    m_intake = new CANSparkMax(8, MotorType.kBrushless);
     myEncoder.setPosition(0);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //detectNode();
+    detectNode();
     SmartDashboard.putBoolean("node in: ", nodeIn);
     SmartDashboard.putNumber("Detected red: ", mySensor.getRed());
     SmartDashboard.putNumber("Detected green: ", mySensor.getGreen());
     SmartDashboard.putNumber("Detected blue: ", mySensor.getBlue());
     SmartDashboard.putNumber("distance: ", distance);
+    
     SmartDashboard.putNumber("pivot angle", myEncoder.getPosition()/66*360);
-
-
-    //nodeIndicator();
-
     
+    nodeIndicator();
     
+    m_arm = new CANSparkMax(9, MotorType.kBrushless);
+    m_intake = new CANSparkMax(8, MotorType.kBrushless);
 
     SmartDashboard.putNumber("angle", myAngle);    
   }
 
- /*  public void detectNode(){
+  public void detectNode(){
     detectedColor = mySensor.getColor();
     
     distance = mySensor.getProximity();
@@ -75,51 +72,38 @@ public class IntakeSub extends SubsystemBase {
       nodeIn = false;
     }
     
-  } */
+  }
 
-  /* public void nodeIndicator(){
+  public void nodeIndicator(){
     if(nodeIn){
       blinkinPWM.set(0.77); // green
     }else{
       blinkinPWM.set(0.61); // red
     }
-  } */
+  }
 
   public void extendIntake(){
     myAngle = (myEncoder.getPosition() / 66)*360;
-    
 
-    
-    if(myAngle <= 70){
-    m_arm.set(0.25);
-    }else{
+    if(myAngle <= 190){
+    m_arm.set(0.10);
+    }
+    else if(myAngle <=205){
+      m_arm.set(0.05);
+    }
+    else{
       m_arm.set(0);
     }
     
   }
 
   public void takeNode(){
-    m_intake.set(0.25);
-  }
-
-  public void stopRoller(){
-    m_intake.set(0);
+    m_intake.set(0.10);
   }
 
   public void retractIntake(){
     m_intake.set(0);
-    m_arm.set(-0.25);
+    m_arm.set(-0.10);
   }
 
-  public void overrideRoller(double speed){
-    m_intake.set(speed);
-    
-  }
-
-
-  public void intakeOverride(double speed){
-    m_arm.set(speed);
-    SmartDashboard.putNumber("intake speed", speed);
-    
-  }
 }

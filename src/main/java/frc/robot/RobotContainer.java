@@ -9,6 +9,7 @@ import frc.robot.commands.AutoDrive;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.IntakeCom;
 import frc.robot.commands.ParralelAuto;
 import frc.robot.commands.intakeOverride;
 import frc.robot.commands.ShooterCommand;
@@ -79,6 +80,10 @@ public class RobotContainer {
     // cancelling on release.
     intake.setDefaultCommand(new intakeOverride(intake, ()->m_driverController.getRightY(), ()->m_driverController.getLeftY()));
     m_driverController.b().whileTrue(new ShooterCommand(shoot));
+    m_driverController.y().whileTrue(new IntakeCom(intake, true, false));
+    m_driverController.x().whileTrue(new IntakeCom(intake, false, false));
+    m_driverController.a().whileTrue(new IntakeCom(intake, false, true));
+
 
      //m_driverController.a().whileTrue(new IntakeCom(intakee, true, false, false, false));
     
