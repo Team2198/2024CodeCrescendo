@@ -39,6 +39,9 @@ public class IntakeSub extends SubsystemBase {
   public IntakeSub() {
     colorMatcher.addColorMatch(NodeColor);
     myEncoder.setPosition(0);
+
+    m_arm = new CANSparkMax(9, MotorType.kBrushless);
+    m_intake = new CANSparkMax(8, MotorType.kBrushless);
   }
 
   @Override
@@ -51,12 +54,7 @@ public class IntakeSub extends SubsystemBase {
     SmartDashboard.putNumber("Detected blue: ", mySensor.getBlue());
     SmartDashboard.putNumber("distance: ", distance);
     
-    SmartDashboard.putNumber("pivot angle", myEncoder.getPosition()/66*360);
-    
     nodeIndicator();
-    
-    m_arm = new CANSparkMax(9, MotorType.kBrushless);
-    m_intake = new CANSparkMax(8, MotorType.kBrushless);
 
     SmartDashboard.putNumber("angle", myAngle);    
   }
