@@ -5,48 +5,45 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
-import frc.robot.subsystems.DriveSub;
-import edu.wpi.first.math.controller.PIDController;
-public class turningCommand extends Command {
-  /** Creates a new turningCommand. */
-  DriveSub drive;
-  double goal = 0;
-  
-  public turningCommand(DriveSub driveS, double target) {
-    
-    drive = driveS;
-    goal = target;
-    addRequirements(drive);
+import frc.robot.subsystems.IntakeSub;
+
+public class colorTest extends Command {
+  IntakeSub intake;
+  boolean play;
+  boolean works;
+  /** Creates a new colorTest. */
+  public colorTest(IntakeSub intake, boolean play, boolean works) {
     // Use addRequirements() here to declare subsystem dependencies.
+    this.intake = intake;
+    this.play = play;
+    this.works = works;
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    
-    
-    
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.robotRelative(0, 0, drive.turnToAngle(goal));
+    
+    if(play){
+      intake.counter();
+    }
+    if(works){
+      intake.colorWorks();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.robotRelative(0, 0, 0);
-    
-  }
-
-  @Override
-  public boolean isFinished(){
-    return drive.atSetpoint();
   }
 
   // Returns true when the command should end.
-  
+  @Override
+  public boolean isFinished() {
+    return true;
+  }
 }

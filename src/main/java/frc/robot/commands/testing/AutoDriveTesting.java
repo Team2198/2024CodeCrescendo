@@ -2,21 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.testing;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.subsystems.DriveSub;
-import edu.wpi.first.math.controller.PIDController;
-public class turningCommand extends Command {
-  /** Creates a new turningCommand. */
+
+public class AutoDriveTesting extends Command {
+  /** Creates a new AutoOne. */
   DriveSub drive;
-  double goal = 0;
-  
-  public turningCommand(DriveSub driveS, double target) {
-    
-    drive = driveS;
-    goal = target;
+  Double target;
+  Double angle;
+  public AutoDriveTesting(DriveSub drive, double target, double angle) {
+    this.drive = drive;
+    this.target = target;
+    this.angle = angle;
     addRequirements(drive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -24,29 +23,27 @@ public class turningCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    drive.setAngle(angle);
+    target = drive.getDrivePosition()+target;
     
-    
-    
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.robotRelative(0, 0, drive.turnToAngle(goal));
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     drive.robotRelative(0, 0, 0);
-    
-  }
-
-  @Override
-  public boolean isFinished(){
-    return drive.atSetpoint();
   }
 
   // Returns true when the command should end.
-  
+  @Override
+  public boolean isFinished() {
+    return drive.followPath(target,angle);
+  }
 }

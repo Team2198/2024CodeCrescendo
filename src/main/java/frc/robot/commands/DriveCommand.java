@@ -30,15 +30,15 @@ public class DriveCommand extends Command {
   SlewRateLimiter yLimiter = new SlewRateLimiter(3);
   SlewRateLimiter turningLimiter = new SlewRateLimiter(3);
   DoubleSupplier turningSpeed;
-  
+  BooleanSupplier robotRelativeDrive;
   BooleanSupplier robotRelative;
-  public DriveCommand(DriveSub driveS, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier turningSpeed, BooleanSupplier robotRelative) {
+  public DriveCommand(DriveSub driveS, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier turningSpeed, BooleanSupplier robotRelative, BooleanSupplier robotRelativeDrive) {
     drive = driveS;
     this.robotRelative = robotRelative;
     this.xSpeed=xSpeed;
     this.ySpeed=ySpeed;
     this.turningSpeed = turningSpeed;
-    
+    this.robotRelativeDrive = robotRelativeDrive;
 
     
     addRequirements(drive);
@@ -66,6 +66,11 @@ public class DriveCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double limelightData = drive.getLimelight();
+    double robotTurnGoal =  drive.getHeading() + limelightData;
+
+    SmartDashboard.putNumber("LimelightX", limelightData);
+    SmartDashboard.putNumber("Robot turn goal", robotTurnGoal);
     double maxTurningRad = Constants.TeleOp.maxTurningRad;
     double xSpeedDub = xSpeed.getAsDouble();
 
@@ -104,27 +109,39 @@ public class DriveCommand extends Command {
 
     turningSpeedDub = turningLimiter.calculate(turningSpeedDub);
     turningSpeedDub *= maxTurningRad;
-    turningSpeedDub*=0.8;
+    
     xSpeedDub*=Constants.TeleOp.maxSpeed;
     ySpeedDub*=Constants.TeleOp.maxSpeed;
     SmartDashboard.putNumber("max turning rad", maxTurningRad);
 
-    if (Math.abs(turningSpeedDub)<0.3){
+    if (Math.abs(turningSpeedDub)<0.2){
       turningSpeedDub = 0;
     }
 
     
 
-    if(Math.abs(ySpeedDub)<0.3){
+    if(Math.abs(ySpeedDub)<0.15){
       ySpeedDub=0;
     }
-
-    if (robotRelative.getAsBoolean()){
-      drive.robotRelative(xSpeedDub, 0, 0);  
+    turningSpeedDub*=0.6;
+    
+    if (robotRelativeDrive.getAsBoolean()){
+      drive.robotRelative(xSpeedDub, ySpeedDub, turningSpeedDub);
+      SmartDashboard.putString("drive type", "robot relative");
+    }
+    
+    else if (robotRelative.getAsBoolean()){
+      drive.robotRelative(xSpeedDub, 0, drive.turnToAngle(robotTurnGoal));  
+      SmartDashboard.putString("drive type", "robot relative auto align");
     }
 
+    
+
     else{
-      drive.robotRelative(xSpeedDub, ySpeedDub, turningSpeedDub);
+      //drive.robotRelative(xSpeedDub, 0, drive.turnToAngle(robotTurnGoal));
+      //drive.robotRelative(xSpeedDub, ySpeedDub, turningSpeedDub);
+      drive.fieldRelative(xSpeedDub, ySpeedDub, turningSpeedDub);
+      SmartDashboard.putString("drive type", "field relative");
     }
 
     

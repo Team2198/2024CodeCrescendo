@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,9 +23,10 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 public class SwerveModule extends SubsystemBase {
   /** Creates a new SwerveModule. */
-  TalonFX driveMotor;
+  TalonFX driveMotor;      
   TalonFX turningMotor;
   CANcoder turningEncoder;
   double turningID;
@@ -76,8 +78,15 @@ public class SwerveModule extends SubsystemBase {
     turningConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     
     turningConfig.Slot0.kP=50;
-    turningConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    
+
+    if (name.equals("back right")){
+      turningConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    }
+    else{
+      turningConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;  
+    } 
+    config.CurrentLimits.StatorCurrentLimit = 35;
+    turningConfig.CurrentLimits.StatorCurrentLimit = 40;
     turningMotor.getConfigurator().apply(turningConfig);
 
     driveMotor.getConfigurator().apply(config);
@@ -95,6 +104,8 @@ public class SwerveModule extends SubsystemBase {
   public void periodic() {
     
     // This method will be called once per scheduler run
+    
+    //setAngle(0);
     SmartDashboard.putNumber("position"+name, getTurningPosition());
     SmartDashboard.putNumber("drive pos"+name, driveMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("turn coder pos"+name, turningEncoder.getPosition().getValueAsDouble());
@@ -123,7 +134,7 @@ public class SwerveModule extends SubsystemBase {
       driveMotor.set(0);
     } */
     driveMotor.set(speed);
-    setAngle(0);
+    //setAngle(90);
 
     /* if (Math.abs(turningSpeed)>0.1){
       turningMotor.set(turningSpeed);
@@ -187,7 +198,7 @@ public class SwerveModule extends SubsystemBase {
         setAngle(Math.toDegrees(state.angle.getRadians()));
         
         driveMotor.setControl(velocitySetter.withVelocity(state.speedMetersPerSecond).withSlot(0));
-       // driveMotor.set(state.sp7eedMetersPerSecond/4.89);
+        //driveMotor.set(state.speedMetersPerSecond/4.89);
         SmartDashboard.putNumber("velocity voltage app"+name, driveMotor.getMotorVoltage().getValueAsDouble());
 
       }
@@ -211,16 +222,21 @@ public class SwerveModule extends SubsystemBase {
     //setSpeed(0,voltageApp);
     
     //SmartDashboard.putNumber("goal",angle);
-    turningMotor.set(voltageApp);
-    //SmartDashboard.putNumber("error", turnPidController.getPositionError());
-    double actualAngle = angle/360+offset;
-    if (actualAngle>0.5){
-      actualAngle =actualAngle-1;
+    if (name.equals("back right")){
+      turningMotor.set(-voltageApp);
     }
+    else{
+      turningMotor.set(voltageApp);
+    }
+    
 
-    else if (actualAngle<-0.5){
-      actualAngle = 1-actualAngle;
-    }
+    //Shuffleboard.getTab("Module turn").add("voltage app "+name, voltageApp);
+    //Shuffleboard.getTab("Module turn").add("wheel angle "+name, getTurningPosition());
+    //Shuffleboard.getTab("Module turn").add("target angle "+name, angle);
+    
+    //SmartDashboard.putNumber("error", turnPidController.getPositionError());
+
+   
 
     //turningMotor.setControl(anglePositionSetter.withPosition(actualAngle));
     SmartDashboard.putNumber("voltage app "+name, voltageApp);
@@ -233,11 +249,15 @@ public class SwerveModule extends SubsystemBase {
     return turnPidController.atSetpoint();
   }
 
-  public boolean followPath(double target){
-    driveMotor.setVoltage(positionController.calculate(getDrivePosition(), target));
+  public boolean followPath(double voltage){
+    driveMotor.setVoltage(voltage);
     
-    driveMotor.setControl(positonSetter.withPosition(target).withSlot(1));
-    return Math.abs(driveMotor.getVelocity().getValueAsDouble())<=0.05;
+    //driveMotor.setControl(positonSetter.withPosition(target).withSlot(1));
+    return positionController.atSetpoint();
+  }
+
+  public void zeroDrive(){
+    driveMotor.setPosition(0);
   }
 
 
