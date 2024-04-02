@@ -13,28 +13,38 @@ public class AutoAlign extends Command {
 
   private DriveSub drive; 
   private double robotTurnGoal; 
+  private boolean aprilOrNot;
 
-  public AutoAlign(DriveSub driveRobot) {
+  public AutoAlign(DriveSub driveRobot, boolean aprilOrNot) {
     // Use addRequirements() here to declare subsystem dependencies.
     
     this.drive = driveRobot;
+    this.aprilOrNot = aprilOrNot; 
 
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double limelightData = drive.getLimelight();
-    this.robotTurnGoal =  drive.getHeading() + limelightData;
-
-    SmartDashboard.putNumber("LimelightX", limelightData);
-    SmartDashboard.putNumber("Robot turn goal", robotTurnGoal);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double data; 
 
+    if (aprilOrNot == false){
+      data = drive.getLimelight();
+    }
+
+    else{
+      data = drive.getSpeakerYaw();
+    }
+    
+    this.robotTurnGoal =  drive.getHeading() + data;
+    drive.robotRelative(0, 0, drive.turnToAngle(robotTurnGoal));
+    SmartDashboard.putNumber("Robot+ turn goal", robotTurnGoal);
     
 
   }

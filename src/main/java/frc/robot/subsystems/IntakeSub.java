@@ -79,7 +79,7 @@ public class IntakeSub extends SubsystemBase {
     }
     SmartDashboard.putNumber("beam counter", beamCounter);
 
-
+    
 
     //nodeVisible();
     //nodeVisible();

@@ -8,7 +8,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSub;
+
 import frc.robot.subsystems.Shooter;
 
 public class ShooterOverride extends Command {
@@ -17,10 +17,14 @@ public class ShooterOverride extends Command {
   DoubleSupplier speed;
   BooleanSupplier on;
   DoubleSupplier rollSpeed;
-  public ShooterOverride(Shooter shooter, DoubleSupplier speed, BooleanSupplier on) {
+  DoubleSupplier speed2;
+  DoubleSupplier speed3;
+  public ShooterOverride(Shooter shooter, DoubleSupplier speed, DoubleSupplier speed2, DoubleSupplier speed3,BooleanSupplier on) {
     this.shooter = shooter;
     this.speed = speed;
     this.on = on;
+    this.speed3 = speed3;
+    this.speed2 = speed2;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -38,7 +42,16 @@ public class ShooterOverride extends Command {
   public void execute() {
     //intake.intakeOverride(speed.getAsDouble()*-1);
     //intake.overrideRoller(rollSpeed.getAsDouble()*-1);
-    shooter.setHood(speed.getAsDouble()*12);
+    
+    if (Math.abs(speed.getAsDouble())>0.08){
+      shooter.setHood(speed.getAsDouble()*-12);
+    }
+    else{
+      shooter.setHood(0);
+    }
+    
+    shooter.setIndexer(speed2.getAsDouble()*-12);
+    shooter.shootMotor(speed3.getAsDouble()*12);
   }
 
   // Called once the command ends or is interrupted.

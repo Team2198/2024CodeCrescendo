@@ -83,7 +83,7 @@ public class DriveSub extends SubsystemBase {
   //private final SwerveModule frontLeft = new SwerveModule(18, 19, 25,0.380615, true,"front left", 0.015, 2.4585);
   //private final SwerveModule frontLeft = new SwerveModule(18, 19, 25,0.380371, true,"front left", 0.015, 2.4585);
   private final SwerveModule frontLeft = new SwerveModule(18, 19, 25,0.376709, true,"front left", 0.015, 2.4585);
-  private final PhotonCamera noteDetectCamera = new PhotonCamera("NoteDetect");
+  private final PhotonCamera noteDetectCamera = new PhotonCamera("object detection");
   //private final SwerveModule frontRight = new SwerveModule(16, 17, 23,-0.668701, true,"front right",0.015, 2.4691);
   private final SwerveModule frontRight = new SwerveModule(16, 17, 23,0.323242, true,"front right",0.015, 2.4691);
   AHRS gyro = new AHRS();
@@ -109,8 +109,8 @@ public class DriveSub extends SubsystemBase {
   PIDController pidController = new PIDController(0.007,0,0);
   SwerveDrivePoseEstimator odometry;
   
-  PhotonCamera camera = new PhotonCamera("AprilTag");
-  Transform3d robotToCam = new Transform3d(new Translation3d(Units.inchesToMeters(-17),0, Units.inchesToMeters( 25)), new Rotation3d(0,Units.degreesToRadians(-30),Units.degreesToRadians(180)));
+  PhotonCamera camera = new PhotonCamera("object detection");
+  Transform3d robotToCam = new Transform3d(new Translation3d(Units.inchesToMeters(0),0, Units.inchesToMeters(22.25)), new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-8),Units.degreesToRadians(0)));
   AprilTagFieldLayout fieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
   PhotonPoseEstimator visionPoseEst = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCam);
   Pose3d robotToField = new Pose3d(new Translation3d(),new Rotation3d());
@@ -138,7 +138,7 @@ public class DriveSub extends SubsystemBase {
     pidController.enableContinuousInput(-180, 180);
     pidController.setTolerance(4);
     robotRelative(0, 0, 0);
-
+    target = blueSpeaker;
     //AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, this::getSpeeds, this::setModuleStates, pathFollowerConfig, ()->false, this);
   }
 
@@ -163,10 +163,11 @@ public class DriveSub extends SubsystemBase {
     //setAngle(90);
     
     odometry.update(getRotation2d(), getModulePositions());
-    arrayPublisher.set(new Pose2d[] {currPoseVision(), getPose()});
+    //arrayPublisher.set(new Pose2d[] {getPose()});
     //SmartDashboard.putNumber("limeligth data x", getLimelight());
-    if (getnumTags()>0){
-      odometry.addVisionMeasurement(currPoseVision(), pipelineTime(), getEstimationStdDevs(currPoseVision()));
+    if (getnumTags()){
+      arrayPublisher.set(new Pose2d[] {currPoseVision()});
+      //odometry.addVisionMeasurement(currPoseVision(), pipelineTime(), getEstimationStdDevs(currPoseVision()));
     }
     
     // This method will be called once per scheduler run
@@ -214,6 +215,28 @@ public class DriveSub extends SubsystemBase {
     }
     return robotToField.toPose2d();
   }
+
+  public double getSpeakerYaw(){
+    Rotation2d yaw = PhotonUtils.getYawToPose(robotToField.toPose2d(),target);
+
+    double degrees = yaw.getDegrees();
+
+    SmartDashboard.putNumber("Speaker Yaw", degrees);
+
+    return degrees;
+    
+    /* 
+    if (degrees < 0){
+      degrees = -180 - degrees;
+    }
+
+    else {
+      degrees = 180 - degrees;
+    }
+    */
+  }
+
+
 
   public void zeroYaw(){
     gyro.zeroYaw();
@@ -315,8 +338,8 @@ public class DriveSub extends SubsystemBase {
         return estStdDevs;
     }
 
-  public double getnumTags(){
-    return getLatestResult().getTargets().size();
+  public boolean getnumTags(){
+    return getLatestResult().hasTargets();
   }
 
   public double getRotHeading(){
@@ -430,11 +453,16 @@ public class DriveSub extends SubsystemBase {
   public double getLimelight(){
    
     PhotonPipelineResult result = noteDetectCamera.getLatestResult();
-
-    double x = result.getBestTarget().getYaw();
-    VisionHelper.updateNoteYaw(x);
-
-    return x;
+    
+    double x = 0;
+    
+    if (result.hasTargets()){
+      x = result.getBestTarget().getYaw();
+   
+    }
+    
+    SmartDashboard.putNumber("note angle", -x);
+    return -x;
   }
 
 

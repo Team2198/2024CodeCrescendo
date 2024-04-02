@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -24,6 +28,7 @@ public final class Constants {
     public static double robotRadius = Units.inchesToMeters(27/2);
     public static final double maxSpeed = 4.86;
     public static final double maxTurningRad= maxSpeed/(Math.sqrt(2*robotRadius*robotRadius));
-
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1, 1, 1000);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
   }
 }

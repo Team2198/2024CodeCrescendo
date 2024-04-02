@@ -137,7 +137,7 @@ public class RobotContainer {
     //op_driverController.a().onTrue(new ShooterCommand(shoot, intake,true).andThen(new WaitCommand(0.5)).andThen(new ShooterCommand(shoot, intake, false)).andThen(new WaitCommand(1)).andThen(new ShooterCommand(shoot, intake, false, true)));
     //m_driverController.a().whileTrue(new IntakeCom(intake, false, true));
     //m_driverController.rightTrigger().onTrue(new AutoAlign(drive, false));
-    //m_driverController.leftTrigger().onTrue(new AutoAlign(drive, true));
+    m_driverController.leftTrigger().onTrue(new AutoAlign(drive, true));
     //m_driverController.a().whileTrue(new IntakeCom(intakee, true, false, false, false));
    // climber.setDefaultCommand(new climbCommand(climber, ()->m_driverController.getLeftY(), ()->m_driverController.getRightY()));
     //m_driverController.rightTrigger().onTrue(intake.extendIntakeOverride());
@@ -154,9 +154,16 @@ public class RobotContainer {
     //intake.setDefaultCommand(new intakeOverride(intake, ()->m_driverController.getRightY(), ()->m_driverController.getLeftY()));
     //actual buttons
     //m_driverController.a().onTrue(drive.visionReset());
-    shoot.setDefaultCommand(new ShooterOverride(shoot, ()->m_driverController.getLeftY(), ()->true));
+    //shoot.setDefaultCommand(new ShooterOverride(shoot, ()->m_driverController.getLeftY(), ()->true));
     //drive.setDefaultCommand(new DriveCommand(drive,()->m_driverController.getLeftY(), ()->m_driverController.getLeftX(), ()->m_driverController.getRightX(), ()->m_driverController.getHID().getAButton(), ()->op_driverController.getHID().getLeftBumper()));
-    //drive.setDefaultCommand(new DriveCommand(drive,()->m_driverController.getLeftY(), ()->m_driverController.getLeftX(), ()->m_driverController.getRightX(), ()->m_driverController.getHID().getAButton(), ()->op_driverController.getHID().getLeftBumper()));
+    drive.setDefaultCommand(new DriveCommand(drive,()->m_driverController.getLeftY(), ()->m_driverController.getLeftX(), ()->m_driverController.getRightX(), ()->m_driverController.getHID().getAButton(), ()->op_driverController.getHID().getLeftBumper()));
+    op_driverController.b().whileTrue(intake.overideRollerCommand(-0.8));
+    op_driverController.b().onFalse(intake.overideRollerCommand(0));
+    shoot.setDefaultCommand(new ShooterOverride(shoot, ()->op_driverController.getLeftY(), ()->op_driverController.getRightY(),()->op_driverController.getRightTriggerAxis(),()->true));
+    op_driverController.y().toggleOnTrue(new IntakeCom(intake, true,false).andThen(new IntakeCom(intake,false,false)));
+    op_driverController.x().toggleOnTrue(new IntakeCom(intake, false, false));
+    op_driverController.a().onTrue(shoot.setShooterAngle(13.57));
+    op_driverController.a().onFalse(shoot.overrideHood(0));
     /* m_driverController.b().whileTrue((new IntakeCom(intake, true, true, ()->true)));
     m_driverController.b().onFalse(new IntakeCom(intake, false, false));
     m_driverController.x().toggleOnTrue(new IntakeCom(intake, false, false));
@@ -190,7 +197,8 @@ public class RobotContainer {
     //return new PathPlannerAuto("New Auto");
     
     //return auto;  
-    return m_chooser.getSelected();
+    //return m_chooser.getSelected();
+    return drive.visionReset();
     //return middleTwoNote;
   }
 }
